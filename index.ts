@@ -2,7 +2,7 @@ import express from 'express';
 import cors from "cors";
 import routes from "./routes/index.route";
 import dotenv from "dotenv";
-import { connectDB } from "./config/database";
+import { connectDB } from './config/database';
 
 // Load biến môi trường
 dotenv.config();
@@ -17,7 +17,8 @@ connectDB();
 app.use(cors({
   origin: "http://localhost:3000",
   methods: ["GET", "POST", "PATCH", "DELETE"],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true // Cho phép gửi cookie
 }));
 
 // Cho phép gửi data lên dạng json
