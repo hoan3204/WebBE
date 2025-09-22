@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import AccountUser from "../models/account-user.model";
 import AccountCompany from "../models/account-company.model";
+import { exist } from "joi";
 
 export const check = async (req: Request, res: Response) => {
   try {
@@ -53,7 +54,17 @@ export const check = async (req: Request, res: Response) => {
         id: existAccountCompany.id,
         companyName: existAccountCompany.companyName,
         email: existAccountCompany.email,
-      }
+        city: existAccountCompany.city,
+        address: existAccountCompany.address,
+        companyModel: existAccountCompany.companyModel,
+        companyEmployees: existAccountCompany.companyEmployees,
+        workingTime: existAccountCompany.workingTime,
+        workOvertime: existAccountCompany.workOvertime,
+        description: existAccountCompany.description,
+        logo: existAccountCompany.logo,
+        phone: existAccountCompany.phone,
+      };
+      
       res.json({
         code: "success",
         message: "Token hợp lệ!",
