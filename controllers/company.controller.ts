@@ -4,6 +4,7 @@ import AccountCompany from "../models/account-company.model";
 import jwt from "jsonwebtoken";
 import { AccountRequest } from "../interfaces/request.interface";
 import Job from "../models/job.model";
+import City from "../models/city.model";
 
 export const registerPost = async (req: Request, res: Response) => {
     const { companyName , email , password } = req.body;
@@ -100,7 +101,7 @@ export const profilePatch = async (req: AccountRequest, res: Response) => {
 export const createJobPost = async (req: AccountRequest, res: Response) => {
     req.body.companyId = req.account.id;
     req.body.salaryMin = req.body.salaryMin ? parseInt(req.body.salaryMin) : 0;
-    req.body.salaryMin = req.body.salaryMax ? parseInt(req.body.salaryMax) : 0;
+    req.body.salaryMax = req.body.salaryMax ? parseInt(req.body.salaryMax) : 0;
     req.body.technologies = req.body.technologies ? req.body.technologies.split(", ") : [];
     req.body.images = [];
 
@@ -116,5 +117,40 @@ export const createJobPost = async (req: AccountRequest, res: Response) => {
     res.json({
         code: "success",
         message: "Tạo công việc thành công!"
+    })
+}
+
+export const listJob = async (req: AccountRequest, res: Response) => {
+    const jobs = await Job
+        .find({
+            companyId: req.account.id
+        })
+        .sort({
+            createdAt: "desc"
+        });
+    const dataFinal = [];
+
+    const city = await City.findOne({
+        _id: req.account.id
+    });
+
+    for (const item of jobs) {
+        dataFinal.push({
+            id: item.id,
+            companyLogo: req.account.logo,
+            title: item.title,
+            companyName: req.account.companyName,
+            salaryMin: item.salaryMin,
+            salaryMax: item.salaryMax,
+            position: item.position,
+            workingForm: item.workingForm,
+            companyCity: city?.name,
+            technologies: item.technologies,
+        })
+    }
+    res.json({
+        code: "success",
+        message: "Lấy danh sách công việc thành công!",
+        jobs: dataFinal
     })
 }
