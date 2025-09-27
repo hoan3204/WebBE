@@ -25,4 +25,6 @@ router.patch("/job/edit/:id", authMiddleware.verifyTokenCompany, upload.array('i
 
 router.delete("/job/delete/:id", authMiddleware.verifyTokenCompany, companyController.deleteJobDel);
 
+router.get("/list", companyController.list)
+
 export default router;
