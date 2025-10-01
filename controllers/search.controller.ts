@@ -30,6 +30,15 @@ export const search = async ( req: Request, res: Response) => {
             }
         }
 
+        //company
+        if(req.query.company) {
+            const accountCompany = await AccountCompany.findOne({
+                companyName: req.query.company
+            })
+
+            find.companyId = accountCompany?.id;
+        }
+
         const jobs = await Job
             .find(find)
             .sort({
