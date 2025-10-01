@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import AccountCompany from "../models/account-company.model";
 import Job from "../models/job.model";
 import City from "../models/city.model";
+import { title } from "process";
 
 export const search = async ( req: Request, res: Response) => {
     const dataFinal = [];
@@ -37,6 +38,25 @@ export const search = async ( req: Request, res: Response) => {
             })
 
             find.companyId = accountCompany?.id;
+        }
+
+        //keyword
+        if(req.query.keyword) {
+            const keywordRegex = new RegExp(`${req.query.keyword}`, "i");
+            find["$or"] = [
+                { title: keywordRegex},
+                { technologies: keywordRegex}
+            ];
+        }
+
+        //position
+        if(req.query.position) {
+            find.position = req.query.position;
+        }
+
+        //Working form
+        if(req.query.workingForm) {
+            find.workingForm = req.query.workingForm;
         }
 
         const jobs = await Job
