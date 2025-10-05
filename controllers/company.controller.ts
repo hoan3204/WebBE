@@ -298,13 +298,29 @@ export const list = async (req: Request, res: Response) => {
   if (req.query.limitItems) {
     limitItems = parseInt(`${req.query.limitItems}`)
   };
+  
+  //phan trang
+  let page = 1;
+  if (req.query.page) {
+    const currentPage = parseInt(`${req.query.page}`);
+    if (currentPage > 0) {
+      page = currentPage;
+    }
+  }
+  const totalRecord = await AccountCompany.countDocuments({});
+  const totalPage = Math.ceil(totalRecord/limitItems);
+  if (page > totalPage && totalPage != 0) {
+    page = totalPage;
+  }
+  const skip = (page -1) * limitItems;
 
   const companyList = await AccountCompany
     .find({})
-    .limit(limitItems)
     .sort({
       createdAt: "desc"
-    });
+    })
+    .limit(limitItems)
+    .skip(skip);
 
   const companyListFinal = [];
   
@@ -325,7 +341,6 @@ export const list = async (req: Request, res: Response) => {
     dataItemFinal.cityName = `${city?.name}`;
 
     //totalJob
-
     const totalJob =await Job.countDocuments({
       companyId: item.id
     });
@@ -337,6 +352,7 @@ export const list = async (req: Request, res: Response) => {
   res.json({
     code: "success",
     message: "Thành công!",
-    companyList: companyListFinal
+    companyList: companyListFinal,
+    totalPage: totalPage
   })
 }
