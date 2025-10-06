@@ -21,6 +21,7 @@
     "multer-storage-cloudinary": "^4.0.0"
   },
   "scripts": {
+    "render-build": "yarn",
     "start": "nodemon index.ts"
   },
   "devDependencies": {
