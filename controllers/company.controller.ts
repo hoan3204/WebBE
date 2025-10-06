@@ -484,3 +484,70 @@ export const listCV = async (req: AccountRequest, res: Response) => {
     listCV: dataFinal
   })
 }
+
+export const detailCV = async (req: AccountRequest, res: Response) => {
+  try {
+    const companyId = req.account.id;
+    const cvId = req.params.id;
+
+    const infoCV = await CV.findOne({
+      _id: cvId
+    });
+
+    if (!infoCV) {
+      res.json({
+        code: "error",
+        messgae: "Id CV không hợp lệ!"
+      });
+      return;
+    }
+
+    const infoJob = await Job.findOne({
+      _id: infoCV.jobId,
+      companyId: companyId
+    })
+
+    if (!infoJob) {
+      res.json({
+        code: "error",
+        message: "Không có quyền truy cập!"
+      });
+      return;
+    }
+
+    const dataFinalCV = {
+      fullName: infoCV.fullName,
+      email: infoCV.email,
+      phone: infoCV.phone,
+      fileCV: infoCV.fileCV
+    }
+
+    const dataFinalJob = {
+      id: infoJob.id,
+      title: infoJob.title,
+      salaryMin: infoJob.salaryMin,
+      salaryMax: infoJob.salaryMax,
+      position: infoJob.position,
+      workingForm: infoJob.workingForm,
+      technologies: infoJob.technologies,
+    };
+
+    await CV.updateOne({
+      _id: cvId
+    }, {
+      viewed: true
+    });
+
+    res.json({
+      code: "success",
+      message: "Thành công!",
+      infoCV: dataFinalCV,
+      infoJob: dataFinalJob,
+    })
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: "Id không hợp lệ!"
+    })
+  }
+}
