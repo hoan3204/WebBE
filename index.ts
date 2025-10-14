@@ -25,6 +25,7 @@ app.use(cors({
       'http://localhost:3000',
       'https://webbe-b4zv.onrender.com',
       'https://webfe-static.onrender.com',
+      'https://webfe-8xdu.onrender.com',
       // Thêm các domain khác nếu cần
     ];
     
