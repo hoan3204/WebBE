@@ -9,14 +9,15 @@ import cookieParser = require('cookie-parser');
 dotenv.config();
 
 const app = express();
-const port = 4000;
+const port = process.env.PORT ? Number(process.env.PORT) : 4000;
+const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
 
 // Kết nối DB
 connectDB();
 
 // Cấu hình CORS
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: clientUrl,
   methods: ["GET", "POST", "PATCH", "DELETE"],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true // Cho phép gửi cookie
