@@ -66,8 +66,28 @@ app.use(cookieParser());
 
 // Cấu hình bảo mật cho cookie
 app.use((req, res, next) => {
+  // Cấu hình CORS headers
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+    return res.status(200).json({});
+  }
+
+  // Thêm middleware để cấu hình cookie mặc định
+  const originalCookie = res.cookie.bind(res);
+  res.cookie = (name: string, value: any, options: any = {}) => {
+    return originalCookie(name, value, {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      sameSite: 'none',
+      maxAge: 24 * 60 * 60 * 1000,
+      ...options // Di chuyển options xuống dưới để override các giá trị mặc định nếu cần
+    });
+  };
+
   next();
 });
 
