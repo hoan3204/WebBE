@@ -31,14 +31,28 @@ app.use(cors({
     ];
     
     if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      // Set the Access-Control-Allow-Origin header to the specific origin
       callback(null, true);
     } else {
       callback(new Error('Không được phép bởi chính sách CORS'));
     }
   },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
-  exposedHeaders: ['Content-Length', 'X-Requested-With'],
+  allowedHeaders: [
+    'Content-Type', 
+    'Authorization', 
+    'Accept', 
+    'Origin', 
+    'X-Requested-With',
+    'Access-Control-Allow-Origin',
+    'Access-Control-Allow-Credentials'
+  ],
+  exposedHeaders: [
+    'Content-Length', 
+    'X-Requested-With',
+    'Access-Control-Allow-Origin',
+    'Access-Control-Allow-Credentials'
+  ],
   credentials: true, // Cho phép gửi cookie qua các domain khác nhau
   preflightContinue: false, // Không tiếp tục xử lý preflight request
   optionsSuccessStatus: 204 // Mã trạng thái thành công cho OPTIONS request
@@ -47,8 +61,15 @@ app.use(cors({
 // Cho phép gửi data lên dạng json
 app.use(express.json());
 
-// Cấu hình lấy cookie
+// Cấu hình cookie
 app.use(cookieParser());
+
+// Cấu hình bảo mật cho cookie
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  next();
+});
 
 // Thiết lập đường dẫn
 app.use("/", routes);
