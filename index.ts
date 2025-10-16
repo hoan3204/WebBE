@@ -18,7 +18,7 @@ connectDB();
 // Cấu hình CORS
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
+    // Cho phép các yêu cầu không có origin (như từ ứng dụng di động hoặc curl requests)
     if (!origin) return callback(null, true);
     
     const allowedOrigins = [
@@ -26,18 +26,22 @@ app.use(cors({
       'https://webbe-b4zv.onrender.com',
       'https://webfe-static.onrender.com',
       'https://webfe-8xdu.onrender.com',
+      'https://webbe-bz2v.onrender.com',
       // Thêm các domain khác nếu cần
     ];
     
     if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error('Không được phép bởi chính sách CORS'));
     }
   },
-  methods: ["GET", "POST", "PATCH", "DELETE"],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true // Cho phép gửi cookie
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+  exposedHeaders: ['Content-Length', 'X-Requested-With'],
+  credentials: true, // Cho phép gửi cookie qua các domain khác nhau
+  preflightContinue: false, // Không tiếp tục xử lý preflight request
+  optionsSuccessStatus: 204 // Mã trạng thái thành công cho OPTIONS request
 }));
 
 // Cho phép gửi data lên dạng json
@@ -50,5 +54,5 @@ app.use(cookieParser());
 app.use("/", routes);
 
 app.listen(port, () => {
-  console.log(`Website đang chạy trên cổng ${port}`);
+  console.log(`Máy chủ đang chạy trên cổng ${port}`);
 });
