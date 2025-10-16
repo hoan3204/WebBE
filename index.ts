@@ -61,33 +61,48 @@ app.use(cors({
 // Cho phép gửi data lên dạng json
 app.use(express.json());
 
-// Cấu hình cookie
+// Cấu hình CORS trước
+app.use(cors({
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'https://webbe-b4zv.onrender.com',
+      'https://webfe-static.onrender.com',
+      'https://webfe-8xdu.onrender.com',
+      'https://webbe-bz2v.onrender.com'
+    ];
+    
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Cấu hình cookie parser
 app.use(cookieParser());
 
-// Cấu hình bảo mật cho cookie
+// Middleware xử lý cookie
 app.use((req, res, next) => {
-  // Cấu hình CORS headers
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-  
-  if (req.method === 'OPTIONS') {
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
-    return res.status(200).json({});
-  }
-
-  // Thêm middleware để cấu hình cookie mặc định
-  const originalCookie = res.cookie.bind(res);
-  res.cookie = (name: string, value: any, options: any = {}) => {
-    return originalCookie(name, value, {
-      secure: process.env.NODE_ENV === 'production',
-      httpOnly: true,
-      sameSite: 'none',
-      maxAge: 24 * 60 * 60 * 1000,
-      ...options // Di chuyển options xuống dưới để override các giá trị mặc định nếu cần
-    });
+  const oldJson = res.json;
+  res.json = function(body) {
+    // Nếu response chứa token, set cookie
+    if (body?.token) {
+      res.cookie('token', body.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'none',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      });
+      // Xóa token khỏi response body
+      delete body.token;
+    }
+    return oldJson.call(this, body);
   };
-
   next();
 });
 
