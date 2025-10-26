@@ -57,6 +57,16 @@ export const loginPost = async (req: Request, res: Response) => {
         return;
     }
 
+  const isPasswordValid = await bcrypt.compare(password, `${existAccount.password}`);
+  if(!isPasswordValid) {
+    res.json({
+      code: "error",
+      message: "Mật khẩu không đúng!"
+    });
+    return;
+  }
+
+
     //tao jwt
     const token = jwt.sign(
         {
