@@ -138,7 +138,7 @@ export const listJob = async (req: AccountRequest, res: Response) => {
     };
 
     //phan trang
-    const limitItem = 2;
+    const limitItem = 5;
     let page = 1;
     if (req.query.page) {
         const currentPage = parseInt(`${req.query.page}`);

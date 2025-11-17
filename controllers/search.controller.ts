@@ -63,7 +63,7 @@ export const search = async ( req: Request, res: Response) => {
         }
 
         //phan trang
-        const limitItems = 2;
+        const limitItems = 5;
         let page = 1;
         if(req.query.page) {
             const currentPage = parseInt(`${req.query.page}`);
